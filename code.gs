@@ -5,14 +5,29 @@
 // ============================================================
 
 function doGet(e) {
-  const action = e && e.parameter ? e.parameter.action : null;
-  
-  if (!action) {
-    return ContentService.createTextOutput(
-      JSON.stringify({ status: "success", message: "API is active and ready to receive requests" })
-    ).setMimeType(ContentService.MimeType.JSON);
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName("Users") || ss.getSheets()[0];
+    const data = sheet.getDataRange().getValues();
+    
+    const users = [];
+    // เริ่มอ่านจากแถวที่ 2 (ข้ามหัวตาราง)
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0]) {
+        users.push({
+          id: String(data[i][0]),
+          name: String(data[i][1]),
+          descriptors: data[i][2] ? JSON.parse(data[i][2]) : []
+        });
+      }
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify(users))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify([]))
+      .setMimeType(ContentService.MimeType.JSON);
   }
-  
 }
 
 function doPost(e) {
