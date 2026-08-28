@@ -11,13 +11,21 @@ function doGet(e) {
     const data = sheet.getDataRange().getValues();
     
     const users = [];
-    // เริ่มอ่านจากแถวที่ 2 (ข้ามหัวตาราง)
     for (let i = 1; i < data.length; i++) {
-      if (data[i][0]) {
+      if (data[i][0] && data[i][2]) {
+        let desc = data[i][2];
+        // แปลงข้อความเป็น JSON Array หากเป็น String
+        if (typeof desc === 'string') {
+          try {
+            desc = JSON.parse(desc);
+          } catch(err) {
+            desc = [];
+          }
+        }
         users.push({
           id: String(data[i][0]),
           name: String(data[i][1]),
-          descriptors: data[i][2] ? JSON.parse(data[i][2]) : []
+          descriptors: desc
         });
       }
     }
