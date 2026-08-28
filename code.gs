@@ -5,20 +5,14 @@
 // ============================================================
 
 function doGet(e) {
-  const action = e.parameter.action;
-  let result;
-
-  if (action === 'getConfig') {
-    result = getConfig();
-  } else if (action === 'getKnownFaces') {
-    result = getKnownFaces();
-  } else {
-    result = { error: 'Unknown action: ' + action };
+  const action = e && e.parameter ? e.parameter.action : null;
+  
+  if (!action) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ status: "success", message: "API is active and ready to receive requests" })
+    ).setMimeType(ContentService.MimeType.JSON);
   }
-
-  return ContentService
-    .createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
+  
 }
 
 function doPost(e) {
@@ -30,7 +24,7 @@ function doPost(e) {
       .createTextOutput(JSON.stringify({ error: 'Invalid JSON body' }))
       .setMimeType(ContentService.MimeType.JSON);
   }
-
+  
   const action = data.action;
   let result;
 
